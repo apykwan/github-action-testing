@@ -25,7 +25,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Test code
+        id: run-test
         run: npm run test
+      - name: Upload test report
+        if: steps.run-test.outcome == 'failure'
+        uses: actions/upload-artifact@v6
+        with:
+            name: test-report
+            path: test.json
   build:
     needs: test
     runs-on: ubuntu-latest
@@ -64,6 +71,6 @@ jobs:
       - name: Output filename
         run: echo "${{ needs.build.outputs.script-file }}"
       - name: Deploy project
-        run: echo "Deploying... $MONGODB_PW"
+        run: echo "Deploying... ${{ secrets.MONGODB_USERNAME }}"
       - run: echo $MONGODB_PW
       - run: echo ${{ env.MONGODB_PW }}
